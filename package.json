@@ -1,0 +1,48 @@
+{
+  "name": "cmake-test-tools",
+  "displayName": "CMake Test Tools",
+  "description": "Test runner for c++ project with CMake support, support Google Test / Catch2.",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.73.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:cpp"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "cmake-test-tools.runTest",
+        "title": "Run Test"
+      },
+      {
+        "command": "cmake-test-tools.discoverTests",
+        "title": "Reload Tests"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "pnpm run compile && pnpm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vitest --config ./vitest.config.ts"
+  },
+  "devDependencies": {
+    "@types/glob": "^8.0.0",
+    "@types/node": "16.x",
+    "@types/vscode": "^1.73.0",
+    "@typescript-eslint/eslint-plugin": "^5.45.0",
+    "@typescript-eslint/parser": "^5.45.0",
+    "@vscode/test-electron": "^2.2.0",
+    "eslint": "^8.28.0",
+    "glob": "^8.0.3",
+    "typescript": "^4.9.3",
+    "vitest": "^0.25.4"
+  }
+}
