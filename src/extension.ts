@@ -7,19 +7,12 @@ import { createRunner } from "./runner";
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+  console.log("activate");
+
   registerAllCommands(context);
-  createRunner(context);
 
   setTimeout(() => {
-    const docs = vscode.workspace.textDocuments;
-
-    for (const doc of docs) {
-      console.log("open files", doc.fileName);
-    }
-
-    for (const doc of vscode.window.visibleTextEditors) {
-      console.log("window files", doc.document.fileName);
-    }
+    createRunner(context);
   }, 100);
 }
 

@@ -1,5 +1,52 @@
 import * as vscode from "vscode";
 import { RunTestCodeLensProvider } from "./codelens";
+import { parseTestCasesFromText, TestCase } from "./parser";
+
+export function buildIdFromTestCase(fileName: string, testCase: TestCase) {
+  return `${fileName}:${testCase.token}:${testCase.name}:${testCase.range?.fromLine}-${testCase.range?.toLine}`;
+}
+
+export function buildTestItemFromTestCases(
+  controller: vscode.TestController,
+  cases: TestCase[],
+  uri: vscode.Uri
+) {
+  function addTestItem(testCase: TestCase) {
+    const id = buildIdFromTestCase(uri.toString(), testCase);
+    const targetLine = testCase.range?.fromLine ?? 0;
+    const item = controller.createTestItem(
+      id,
+      testCase.token + ": \t" + testCase.name,
+      uri.with({ fragment: (targetLine + 1).toString() })
+    );
+    item.canResolveChildren = testCase.children.length > 0;
+
+    testCase.children.forEach((childCase) =>
+      item.children.add(addTestItem(childCase))
+    );
+
+    return item;
+  }
+
+  return cases.map((testCase) => addTestItem(testCase));
+}
+
+export function createRunnerFromFile(
+  testController: vscode.TestController,
+  doc: vscode.TextDocument
+) {
+  const entry = testController.createTestItem(
+    doc.uri.toString(),
+    doc.fileName,
+    doc.uri
+  );
+  const cases = parseTestCasesFromText(doc.getText());
+  buildTestItemFromTestCases(testController, cases, doc.uri).forEach((item) =>
+    entry.children.add(item)
+  );
+
+  testController.items.add(entry);
+}
 
 export function createRunner(ctx: vscode.ExtensionContext) {
   const testController = vscode.tests.createTestController(
@@ -7,20 +54,27 @@ export function createRunner(ctx: vscode.ExtensionContext) {
     "Current File Tests"
   );
 
-  const item = testController.createTestItem("hello", "sample test 2");
+  const openedFiles = vscode.workspace.textDocuments;
 
-  item.canResolveChildren = true;
+  for (const doc of openedFiles) {
+    createRunnerFromFile(testController, doc);
+  }
 
-  const child = testController.createTestItem("hello child", "child test");
-
-  item.children.add(child);
-
-  testController.items.add(item);
+  function runTest() {
+    console.log("hello", arguments);
+  }
 
   testController.createRunProfile(
     "Run Test",
     vscode.TestRunProfileKind.Run,
-    console.log,
+    runTest,
+    true
+  );
+
+  testController.createRunProfile(
+    "Debug Test",
+    vscode.TestRunProfileKind.Debug,
+    runTest,
     true
   );
 

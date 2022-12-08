@@ -1,5 +1,10 @@
 import { expect, describe, it } from "vitest";
-import { equalFrom, parseCatch2FromText, Catch2TestCase } from "../parser";
+import {
+  Catch2TestCase,
+  equalFrom,
+  parseTestCasesFromText,
+  TestCase,
+} from "../parser";
 
 describe("Parser Test Suite", () => {
   it("Test equalFrom", () => {
@@ -19,8 +24,8 @@ SCENARIO("1") {
 }
     `;
 
-    const expectResult: Catch2TestCase = {
-      type: "SCENARIO",
+    const expectResult: TestCase = {
+      token: "SCENARIO",
       name: "1",
       range: {
         fromLine: 1,
@@ -28,7 +33,7 @@ SCENARIO("1") {
       },
       children: [
         {
-          type: "GIVEN",
+          token: "GIVEN",
           name: "2",
           range: {
             fromLine: 2,
@@ -36,7 +41,7 @@ SCENARIO("1") {
           },
           children: [
             {
-              type: "WHEN",
+              token: "WHEN",
               name: "3",
               range: {
                 fromLine: 3,
@@ -44,7 +49,7 @@ SCENARIO("1") {
               },
               children: [
                 {
-                  type: "THEN",
+                  token: "THEN",
                   name: "4",
                   range: {
                     fromLine: 4,
@@ -59,7 +64,7 @@ SCENARIO("1") {
       ],
     };
 
-    const result = parseCatch2FromText(text);
+    const result = parseTestCasesFromText(text);
 
     expect(result.length).toBe(1);
     expect(result).toEqual([expectResult]);
@@ -77,9 +82,9 @@ SCENARIO("1") {
 SCENARIO("2") {
 }
     `;
-    const expectResult: Catch2TestCase[] = [
+    const expectResult: TestCase[] = [
       {
-        type: "SCENARIO",
+        token: "SCENARIO",
         name: "1",
         range: {
           fromLine: 1,
@@ -87,7 +92,7 @@ SCENARIO("2") {
         },
         children: [
           {
-            type: "GIVEN",
+            token: "GIVEN",
             name: "1.1",
             range: {
               fromLine: 2,
@@ -96,7 +101,7 @@ SCENARIO("2") {
             children: [],
           },
           {
-            type: "GIVEN",
+            token: "GIVEN",
             name: "1.2",
             range: {
               fromLine: 4,
@@ -107,7 +112,7 @@ SCENARIO("2") {
         ],
       },
       {
-        type: "SCENARIO",
+        token: "SCENARIO",
         name: "2",
         range: {
           fromLine: 8,
@@ -117,7 +122,7 @@ SCENARIO("2") {
       },
     ];
 
-    const result = parseCatch2FromText(text);
+    const result = parseTestCasesFromText(text);
 
     expect(result.length).toBe(2);
     expect(result).toEqual(expectResult);
@@ -130,14 +135,14 @@ SCENARIO( "1"    ) {
 }    
     `;
 
-    const expectResult: Catch2TestCase[] = [
+    const expectResult: TestCase[] = [
       {
-        type: "SCENARIO",
+        token: "SCENARIO",
         name: "1",
         range: { fromLine: 1, toLine: 3 },
         children: [
           {
-            type: "GIVEN",
+            token: "GIVEN",
             name: "  2",
             range: {
               fromLine: 2,
@@ -149,7 +154,7 @@ SCENARIO( "1"    ) {
       },
     ];
 
-    expect(parseCatch2FromText(text)).toEqual(expectResult);
+    expect(parseTestCasesFromText(text)).toEqual(expectResult);
   });
 
   it("Bad Case: Unmatched Parentheses", () => {
@@ -159,7 +164,7 @@ SCENARIO("1") {
 }    
     `;
 
-    expect(() => parseCatch2FromText(text)).not.toThrowError();
+    expect(() => parseTestCasesFromText(text)).not.toThrowError();
   });
 
   it("Bad Case: Unmatched Parentheses Right", () => {
@@ -169,7 +174,7 @@ SCENARIO("1") {
 }    
     `;
 
-    expect(() => parseCatch2FromText(text)).not.toThrow();
+    expect(() => parseTestCasesFromText(text)).not.toThrow();
   });
 
   it("Bad Case: Unmatched Brackets Right", () => {
@@ -179,6 +184,53 @@ SCENARIO("1") {
 }    
     `;
 
-    expect(() => parseCatch2FromText(text)).not.toThrow();
+    expect(() => parseTestCasesFromText(text)).not.toThrow();
+  });
+
+  it("Match second args of Macros", () => {
+    const text = `
+SCENARIO_METHOD(TestMethod, "1") {
+  GIVEN("2") {}
+}
+    `;
+    const expectResult = {
+      token: "SCENARIO_METHOD",
+      name: "1",
+      range: {
+        fromLine: 1,
+        toLine: 3,
+      },
+      children: [
+        {
+          token: "GIVEN",
+          name: "2",
+          range: {
+            fromLine: 2,
+            toLine: 2,
+          },
+          children: [],
+        },
+      ],
+    };
+    expect(parseTestCasesFromText(text)).toEqual([expectResult]);
+  });
+
+  it("Match with brackets in name", () => {
+    const text = `
+      SCENARIO("test() and struct{}") {}
+    `;
+
+    const expectResult: Catch2TestCase = {
+      token: "SCENARIO",
+      name: "test() and struct{}",
+      range: {
+        fromLine: 1,
+        toLine: 1,
+      },
+      children: [],
+    };
+
+    const parsed = parseTestCasesFromText(text);
+    expect(parsed).toEqual([expectResult]);
   });
 });
