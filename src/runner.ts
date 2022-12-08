@@ -1,5 +1,4 @@
 import * as vscode from "vscode";
-import { RunTestCodeLensProvider } from "./codelens";
 import { parseTestCasesFromText, TestCase } from "./parser";
 
 export function buildIdFromTestCase(fileName: string, testCase: TestCase) {
@@ -20,6 +19,7 @@ export function buildTestItemFromTestCases(
       uri.with({ fragment: (targetLine + 1).toString() })
     );
     item.canResolveChildren = testCase.children.length > 0;
+    item.sortText = targetLine.toString().padStart(10, "0");
 
     testCase.children.forEach((childCase) =>
       item.children.add(addTestItem(childCase))
@@ -35,54 +35,16 @@ export function createRunnerFromFile(
   testController: vscode.TestController,
   doc: vscode.TextDocument
 ) {
-  const entry = testController.createTestItem(
-    doc.uri.toString(),
-    doc.fileName,
-    doc.uri
-  );
-  const cases = parseTestCasesFromText(doc.getText());
-  buildTestItemFromTestCases(testController, cases, doc.uri).forEach((item) =>
-    entry.children.add(item)
-  );
-
-  testController.items.add(entry);
-}
-
-export function createRunner(ctx: vscode.ExtensionContext) {
-  const testController = vscode.tests.createTestController(
-    "CMake Tests",
-    "Current File Tests"
-  );
-
-  const openedFiles = vscode.workspace.textDocuments;
-
-  for (const doc of openedFiles) {
-    createRunnerFromFile(testController, doc);
+  if (doc.languageId === "cpp") {
+    const entry = testController.createTestItem(
+      doc.uri.toString(),
+      doc.fileName,
+      doc.uri
+    );
+    const cases = parseTestCasesFromText(doc.getText());
+    buildTestItemFromTestCases(testController, cases, doc.uri).forEach((item) =>
+      entry.children.add(item)
+    );
+    return entry;
   }
-
-  function runTest() {
-    console.log("hello", arguments);
-  }
-
-  testController.createRunProfile(
-    "Run Test",
-    vscode.TestRunProfileKind.Run,
-    runTest,
-    true
-  );
-
-  testController.createRunProfile(
-    "Debug Test",
-    vscode.TestRunProfileKind.Debug,
-    runTest,
-    true
-  );
-
-  const codeLensController = vscode.languages.registerCodeLensProvider(
-    { language: "cpp", scheme: "file" },
-    new RunTestCodeLensProvider()
-  );
-
-  ctx.subscriptions.push(testController);
-  ctx.subscriptions.push(codeLensController);
 }
