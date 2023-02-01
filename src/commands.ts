@@ -1,16 +1,24 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
-
-import { withPrefix } from "./constant";
-
-export enum Commands {
-  RunTest = "runTest",
-  DiscoverTests = "discoverTests",
-}
+import { Commands } from "./constant";
+import { runCommand } from "./terminal";
 
 const commands = {
-  [Commands.RunTest]: () => {
-    vscode.window.showInformationMessage("Building Test...");
+  [Commands.RunTest]: (args: any[]) => {
+    vscode.window.showInformationMessage(
+      "Building Test..." + JSON.stringify(args)
+    );
+    vscode.commands
+      .executeCommand("cmake.getLaunchTargetPath")
+      .then((target) => {
+        runCommand("echo hello " + target);
+      });
+  },
+  [Commands.DebugTest]: () => {
+    vscode.window.showInformationMessage("Debuging Test...");
+  },
+  [Commands.GetTestParam]: () => {
+    return "test";
   },
   [Commands.DiscoverTests]: () => {
     vscode.window.withProgress(
@@ -49,7 +57,7 @@ export function registerAllCommands(ctx: vscode.ExtensionContext) {
     console.log("create command", commandName);
 
     const commandItem = vscode.commands.registerCommand(
-      withPrefix(commandName),
+      commandName,
       commands[commandName as Commands]
     );
 

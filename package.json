@@ -1,16 +1,19 @@
 {
   "name": "cmake-test-tools",
   "displayName": "CMake Test Tools",
-  "description": "Test runner for c++ project with CMake support, support Google Test / Catch2.",
+  "description": "Single Test Case runner for c++ project with CMake support, support Google Test / Catch2.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.73.0"
   },
   "categories": [
-    "Other"
+    "Testing"
   ],
   "activationEvents": [
     "onLanguage:cpp"
+  ],
+  "extensionDependencies": [
+    "ms-vscode.cmake-tools"
   ],
   "main": "./out/extension.js",
   "contributes": {
@@ -20,8 +23,17 @@
         "title": "Run Test"
       },
       {
+        "command": "cmake-test-tools.debugTest",
+        "title": "Debug Test"
+      },
+      {
         "command": "cmake-test-tools.discoverTests",
         "title": "Reload Tests"
+      },
+      {
+        "command": "cmake-test-tools.getTestParam",
+        "enablement": "false",
+        "title": ""
       }
     ]
   },

@@ -92,7 +92,7 @@ class TestContext {
   }
 
   runTest() {
-    console.log("hello", arguments);
+    vscode.window.showInformationMessage("hello" + JSON.stringify(arguments));
   }
 
   createRunnerFromOpenedFiles() {

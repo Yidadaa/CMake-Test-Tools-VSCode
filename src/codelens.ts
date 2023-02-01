@@ -1,5 +1,6 @@
 import * as vscode from "vscode";
 import { parseTestCasesFromText } from "./parser";
+import { Commands } from "./constant";
 
 export class RunTestCodeLensProvider implements vscode.CodeLensProvider {
   async provideCodeLenses(
@@ -10,13 +11,15 @@ export class RunTestCodeLensProvider implements vscode.CodeLensProvider {
     let lens: vscode.CodeLens[] = [];
 
     let command: vscode.Command = {
-      command: "cmake-test-tools.runCurrentTest",
+      command: Commands.RunTest,
       title: "Run",
+      arguments: [],
     };
 
     let debugCommand: vscode.Command = {
-      command: "cmake-test-tools.runCurrentTest",
+      command: Commands.DebugTest,
       title: "Debug",
+      arguments: [],
     };
 
     while (testCases.length > 0) {
@@ -30,8 +33,13 @@ export class RunTestCodeLensProvider implements vscode.CodeLensProvider {
           testRange.toLine,
           0
         );
-        lens.push(new vscode.CodeLens(lensRange, command));
-        lens.push(new vscode.CodeLens(lensRange, debugCommand));
+        const args = testCase;
+        lens.push(
+          new vscode.CodeLens(lensRange, { ...command, arguments: [args] })
+        );
+        lens.push(
+          new vscode.CodeLens(lensRange, { ...debugCommand, arguments: [args] })
+        );
       }
 
       testCase?.children.forEach((item) => testCases.push(item));

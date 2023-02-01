@@ -45,6 +45,9 @@ export function createRunnerFromFile(
     buildTestItemFromTestCases(testController, cases, doc.uri).forEach((item) =>
       entry.children.add(item)
     );
-    return entry;
+
+    if (cases.length > 0) {
+      return entry;
+    }
   }
 }

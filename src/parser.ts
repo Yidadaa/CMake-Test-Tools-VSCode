@@ -8,6 +8,11 @@ const matchFirstStringArg: MatchCase = {
   groupIndex: 1,
 };
 
+const matchAllString: MatchCase = {
+  regex: ".*",
+  groupIndex: 0,
+};
+
 export const CATCH2_TOKENS = {
   ["SCENARIO_METHOD"]: matchFirstStringArg,
   ["SCENARIO"]: matchFirstStringArg,
@@ -25,9 +30,9 @@ export const CATCH2_TOKENS = {
 export type Catch2TokenType = keyof typeof CATCH2_TOKENS;
 
 export const GTEST_TOKENS = {
-  ["TEST"]: matchFirstStringArg,
-  ["TEST_F"]: matchFirstStringArg,
-  ["TEST_P"]: matchFirstStringArg,
+  ["TEST"]: matchAllString,
+  ["TEST_F"]: matchAllString,
+  ["TEST_P"]: matchAllString,
 };
 export type GtestTokenType = keyof typeof GTEST_TOKENS;
 
@@ -43,6 +48,7 @@ export interface TestCase<T = string> {
   name: string;
   range?: TestCaseRange;
   children: TestCase[];
+  parent?: TestCase;
 }
 
 export type Catch2TestCase = TestCase<Catch2TokenType>;
@@ -129,6 +135,7 @@ export function parseTestCasesFromText(text: string): TestCase[] {
             toLine: lineCount,
           },
           children: [],
+          parent: st.at(-1)?.case,
         };
 
         // Match name in next ()
@@ -143,7 +150,6 @@ export function parseTestCasesFromText(text: string): TestCase[] {
         // Match `)`
         let parenthesesCount = 1;
         while (i < text.length) {
-          childCase.name += text.at(i) ?? "";
           if (text[i] === "(") {
             parenthesesCount += 1;
           } else if (text[i] === ")") {
@@ -152,12 +158,12 @@ export function parseTestCasesFromText(text: string): TestCase[] {
 
           if (parenthesesCount === 0) {
             break;
+          } else {
+            childCase.name += text.at(i) ?? "";
           }
 
           move(1);
         }
-
-        console.log(childCase.name);
 
         const matches = childCase.name.match(matchCase.regex);
         childCase.name = matches ? matches.at(matchCase.groupIndex) ?? "" : "";
