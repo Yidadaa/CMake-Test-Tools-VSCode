@@ -3,8 +3,15 @@
 using namespace std;
 using namespace Hello;
 
-int main(int argc, char *argv[]) {
-  Speaker* speaker = new Speaker();
+// GIVEN
 
-  speaker->sayHello();  
+int main(int argc, char *argv[]) {
+  Speaker *speaker = new Speaker();
+
+  speaker->sayHello();
+
+  std::cout << argc << std::endl;
+  for (int i = 0; i < argc; ++i) {
+    std::cout << argv[i] << std::endl;
+  }
 }

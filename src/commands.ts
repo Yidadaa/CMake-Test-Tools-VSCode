@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
-import { Commands } from "./constant";
+import { Commands, GlobalVars } from "./constant";
 import { runCommand } from "./terminal";
 
 const commands = {
@@ -8,17 +8,29 @@ const commands = {
     vscode.window.showInformationMessage(
       "Building Test..." + JSON.stringify(args)
     );
-    vscode.commands
-      .executeCommand("cmake.getLaunchTargetPath")
-      .then((target) => {
-        runCommand("echo hello " + target);
-      });
+
+    vscode.commands.executeCommand("cmake.build").then((target) => {
+      vscode.commands
+        .executeCommand("cmake.getLaunchTargetPath")
+        .then((target) => {
+          runCommand([target, GlobalVars.testParam].join(" "));
+        });
+    });
   },
   [Commands.DebugTest]: () => {
     vscode.window.showInformationMessage("Debuging Test...");
+
+    vscode.debug.startDebugging(undefined, {
+      type: "lldb",
+      request: "launch",
+      name: "Debug",
+      program: "${command:cmake.launchTargetPath}",
+      args: ["${command:cmake-test-tools.getTestParam}"],
+      cwd: "${workspaceFolder}",
+    });
   },
   [Commands.GetTestParam]: () => {
-    return "test";
+    return GlobalVars.testParam;
   },
   [Commands.DiscoverTests]: () => {
     vscode.window.withProgress(

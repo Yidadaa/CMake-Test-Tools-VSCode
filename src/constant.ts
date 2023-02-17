@@ -9,3 +9,7 @@ export enum Commands {
   DiscoverTests = "cmake-test-tools.discoverTests",
   GetTestParam = "cmake-test-tools.getTestParam",
 }
+
+export const GlobalVars = {
+  testParam: "empty",
+};
