@@ -2,35 +2,36 @@
 import * as vscode from "vscode";
 import { Commands, GlobalVars } from "./constant";
 import { runCommand } from "./terminal";
+import { TestCase } from "./parser";
+import * as fs from "fs";
 
 const commands = {
-  [Commands.RunTest]: (args: any[]) => {
-    vscode.window.showInformationMessage(
-      "Building Test..." + JSON.stringify(args)
-    );
+  [Commands.RunTest]: (testCase?: TestCase) => {
+    GlobalVars.currentTestCase = testCase;
 
-    vscode.commands.executeCommand("cmake.build").then((target) => {
+    vscode.commands.executeCommand("cmake.build").then((res) => {
       vscode.commands
         .executeCommand("cmake.getLaunchTargetPath")
         .then((target) => {
-          runCommand([target, GlobalVars.testParam].join(" "));
+          vscode.window.showInformationMessage(target as string);
+
+          runCommand([target, ...GlobalVars.getTestArgs()].join(" "));
         });
     });
   },
-  [Commands.DebugTest]: () => {
-    vscode.window.showInformationMessage("Debuging Test...");
-
+  [Commands.DebugTest]: (testCase: TestCase) => {
+    GlobalVars.currentTestCase = testCase;
     vscode.debug.startDebugging(undefined, {
       type: "lldb",
       request: "launch",
-      name: "Debug",
+      name: "Debug CMake Target Test",
       program: "${command:cmake.launchTargetPath}",
-      args: ["${command:cmake-test-tools.getTestParam}"],
+      args: GlobalVars.getTestArgs(),
       cwd: "${workspaceFolder}",
     });
   },
   [Commands.GetTestParam]: () => {
-    return GlobalVars.testParam;
+    return GlobalVars.getTestArgs();
   },
   [Commands.DiscoverTests]: () => {
     vscode.window.withProgress(
@@ -66,8 +67,6 @@ const commands = {
 
 export function registerAllCommands(ctx: vscode.ExtensionContext) {
   for (const commandName in commands) {
-    console.log("create command", commandName);
-
     const commandItem = vscode.commands.registerCommand(
       commandName,
       commands[commandName as Commands]

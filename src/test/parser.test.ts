@@ -6,6 +6,20 @@ import {
   TestCase,
 } from "../parser";
 
+function exclude<T extends { children: T[] }>(
+  testCase: T,
+  fields: Array<keyof T>
+) {
+  fields.forEach((field) => delete testCase[field]);
+  testCase.children.forEach((child) => exclude(child, fields));
+
+  return testCase;
+}
+
+function excludeParent<T extends { parent?: T; children: T[] }>(cases: T[]) {
+  return cases.map((v) => exclude(v, ["parent"]));
+}
+
 describe("Parser Test Suite", () => {
   it("Test equalFrom", () => {
     expect(equalFrom("abcd", 0, "abc")).toBe(true);
@@ -67,7 +81,7 @@ SCENARIO("1") {
     const result = parseTestCasesFromText(text);
 
     expect(result.length).toBe(1);
-    expect(result).toEqual([expectResult]);
+    expect(excludeParent(result)).toEqual([expectResult]);
   });
 
   it("Parse Multi Scenarios and GWT", () => {
@@ -125,7 +139,7 @@ SCENARIO("2") {
     const result = parseTestCasesFromText(text);
 
     expect(result.length).toBe(2);
-    expect(result).toEqual(expectResult);
+    expect(excludeParent(result)).toEqual(expectResult);
   });
 
   it("Unformatted Input Scenario", () => {
@@ -154,7 +168,7 @@ SCENARIO( "1"    ) {
       },
     ];
 
-    expect(parseTestCasesFromText(text)).toEqual(expectResult);
+    expect(excludeParent(parseTestCasesFromText(text))).toEqual(expectResult);
   });
 
   it("Bad Case: Unmatched Parentheses", () => {
@@ -212,7 +226,7 @@ SCENARIO_METHOD(TestMethod, "1") {
         },
       ],
     };
-    expect(parseTestCasesFromText(text)).toEqual([expectResult]);
+    expect(excludeParent(parseTestCasesFromText(text))).toEqual([expectResult]);
   });
 
   it("Match with brackets in name", () => {
@@ -231,6 +245,6 @@ SCENARIO_METHOD(TestMethod, "1") {
     };
 
     const parsed = parseTestCasesFromText(text);
-    expect(parsed).toEqual([expectResult]);
+    expect(excludeParent(parsed)).toEqual([expectResult]);
   });
 });

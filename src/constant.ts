@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
+import { TestCase } from "./parser";
 
 export const EXTENSION_NAME = "cmake-test-tools";
 
@@ -11,5 +12,18 @@ export enum Commands {
 }
 
 export const GlobalVars = {
-  testParam: "empty",
+  currentTestCase: undefined as TestCase | undefined,
+  getTestArgs() {
+    let args: string[] = [];
+    let testCase = this.currentTestCase;
+
+    while (testCase) {
+      args.push(testCase.name);
+      testCase = testCase.parent;
+    }
+
+    args.pop();
+
+    return args.reverse().map((v) => `"${v}"`);
+  },
 };

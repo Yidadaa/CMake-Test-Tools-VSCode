@@ -3,14 +3,14 @@
 using namespace std;
 using namespace Hello;
 
-// GIVEN
+// GIVEN("hello")
 
 int main(int argc, char *argv[]) {
   Speaker *speaker = new Speaker();
 
   speaker->sayHello();
 
-  std::cout << argc << std::endl;
+  std::cout << argc + 2 << std::endl;
   for (int i = 0; i < argc; ++i) {
     std::cout << argv[i] << std::endl;
   }
