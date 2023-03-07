@@ -1,5 +1,0 @@
-{
-  "cmake.debugConfig": {
-    // "args": ["${command:cmake-test-tools.getTestParam}"]
-  }
-}

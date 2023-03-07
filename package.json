@@ -1,7 +1,7 @@
 {
   "name": "cmake-test-tools",
   "displayName": "CMake Test Tools",
-  "description": "Single Test Case runner for c++ project with CMake support, support Google Test / Catch2.",
+  "description": "Test Case runner for c++ project with CMake support, support Google Test / Catch2.",
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.73.0"
@@ -33,7 +33,7 @@
       {
         "command": "cmake-test-tools.getTestParam",
         "enablement": "false",
-        "title": ""
+        "title": "Get Test Param"
       }
     ]
   },

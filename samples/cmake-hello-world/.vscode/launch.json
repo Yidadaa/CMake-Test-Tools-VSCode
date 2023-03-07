@@ -9,7 +9,6 @@
       "request": "launch",
       "name": "Debug",
       "program": "${command:cmake.launchTargetPath}",
-      "args": ["${command:cmake-test-tools.getTestParam}"],
       "cwd": "${workspaceFolder}"
     }
   ]
