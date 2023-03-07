@@ -27,6 +27,32 @@ export const CATCH2_TOKENS = {
   ["SECTION"]: matchFirstStringArg,
 };
 
+const a = `
+// "BDD-style" convenience wrappers
+#define SCENARIO( ... ) TEST_CASE( "Scenario: " __VA_ARGS__ )
+#define SCENARIO_METHOD( className, ... ) INTERNAL_CATCH_TEST_CASE_METHOD( className, "Scenario: " __VA_ARGS__ )
+#define GIVEN( desc )     INTERNAL_CATCH_DYNAMIC_SECTION( "    Given: " << desc )
+#define AND_GIVEN( desc ) INTERNAL_CATCH_DYNAMIC_SECTION( "And given: " << desc )
+#define WHEN( desc )      INTERNAL_CATCH_DYNAMIC_SECTION( "     When: " << desc )
+#define AND_WHEN( desc )  INTERNAL_CATCH_DYNAMIC_SECTION( " And when: " << desc )
+#define THEN( desc )      INTERNAL_CATCH_DYNAMIC_SECTION( "     Then: " << desc )
+#define AND_THEN( desc )  INTERNAL_CATCH_DYNAMIC_SECTION( "      And: " << desc )
+`;
+
+export const TOKEN_PREFIX: Record<string, string> = {
+  ["SCENARIO_METHOD"]: "Scenario: ",
+  ["SCENARIO"]: "Scenario: ",
+  ["GIVEN"]: "    Given: ",
+  ["AND_GIVEN"]: "And given: ",
+  ["WHEN"]: "     When: ",
+  ["AND_WHEN"]: " And when: ",
+  ["THEN"]: "     Then: ",
+  ["AND_THEN"]: "      And: ",
+  ["TEST_CASE"]: "",
+  ["TEST_CASE_METHOD"]: "",
+  ["SECTION"]: "",
+};
+
 export type Catch2TokenType = keyof typeof CATCH2_TOKENS;
 
 export const GTEST_TOKENS = {
@@ -36,7 +62,21 @@ export const GTEST_TOKENS = {
 };
 export type GtestTokenType = keyof typeof GTEST_TOKENS;
 
-export const PRESET_TOKENS = { ...CATCH2_TOKENS, ...GTEST_TOKENS };
+const TOKEN_TYPES = ["gtest", "catch2"] as const;
+export type TokenType = typeof TOKEN_TYPES[number];
+
+/**
+ * All preset tokens and its type
+ */
+export const PRESET_TOKENS = [GTEST_TOKENS, CATCH2_TOKENS].reduce(
+  (pre, cur, i) => {
+    return Object.assign(
+      pre,
+      Object.fromEntries(Object.keys(cur).map((t) => [t, TOKEN_TYPES[i]]))
+    );
+  },
+  {} as Record<string, TokenType>
+);
 
 export interface TestCaseRange {
   fromLine: number;
@@ -65,7 +105,7 @@ export function equalFrom(s: string, pos: number, target: string) {
 }
 
 export function getAllTokens(): Record<string, MatchCase> {
-  return PRESET_TOKENS;
+  return { ...GTEST_TOKENS, ...CATCH2_TOKENS };
 }
 
 export function parseTestCasesFromText(text: string): TestCase[] {

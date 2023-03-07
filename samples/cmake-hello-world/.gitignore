@@ -8,3 +8,4 @@ CMakeHelloWorld
 *.a
 **/*.a
 build/**
+.cache

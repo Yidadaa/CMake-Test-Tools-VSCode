@@ -5,31 +5,50 @@ import { runCommand } from "./terminal";
 import { TestCase } from "./parser";
 import * as fs from "fs";
 
-const commands = {
-  [Commands.RunTest]: (testCase?: TestCase) => {
-    GlobalVars.currentTestCase = testCase;
+export function runTest(testCase?: TestCase) {
+  GlobalVars.currentTestCase = testCase;
 
-    vscode.commands.executeCommand("cmake.build").then((res) => {
-      vscode.commands
-        .executeCommand("cmake.getLaunchTargetPath")
-        .then((target) => {
-          vscode.window.showInformationMessage(target as string);
+  vscode.commands.executeCommand("cmake.build").then((res) => {
+    vscode.commands
+      .executeCommand("cmake.getLaunchTargetPath")
+      .then((target) => {
+        vscode.window.showInformationMessage(target as string);
 
-          runCommand([target, ...GlobalVars.getTestArgs()].join(" "));
+        vscode.tasks.executeTask({
+          definition: { type: "" },
+          scope: undefined,
+          name: "Run Test Case",
+          isBackground: false,
+          source: "cmake-test-tools",
+          execution: new vscode.ShellExecution(
+            target as string,
+            GlobalVars.getTestArgs()
+          ),
+          presentationOptions: {},
+          problemMatchers: [],
+          runOptions: {},
         });
-    });
-  },
-  [Commands.DebugTest]: (testCase: TestCase) => {
-    GlobalVars.currentTestCase = testCase;
-    vscode.debug.startDebugging(undefined, {
-      type: "lldb",
-      request: "launch",
-      name: "Debug CMake Target Test",
-      program: "${command:cmake.launchTargetPath}",
-      args: GlobalVars.getTestArgs(),
-      cwd: "${workspaceFolder}",
-    });
-  },
+
+        // runCommand([target, ...GlobalVars.getTestArgs(true)].join(" "));
+      });
+  });
+}
+
+export function debugTest(testCase: TestCase) {
+  GlobalVars.currentTestCase = testCase;
+  vscode.debug.startDebugging(undefined, {
+    type: "lldb",
+    request: "launch",
+    name: "Debug CMake Target Test",
+    program: "${command:cmake.launchTargetPath}",
+    args: GlobalVars.getTestArgs(),
+    cwd: "${workspaceFolder}",
+  });
+}
+
+const commands = {
+  [Commands.RunTest]: runTest,
+  [Commands.DebugTest]: debugTest,
   [Commands.GetTestParam]: () => {
     return GlobalVars.getTestArgs();
   },

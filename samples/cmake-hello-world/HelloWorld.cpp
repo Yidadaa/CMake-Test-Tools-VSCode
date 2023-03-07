@@ -1,14 +1,7 @@
-#include <Speaker.h>
-
-using namespace std;
-using namespace Hello;
-
-// GIVEN("hello")
+#include <iostream>
 
 int main(int argc, char *argv[]) {
-  Speaker *speaker = new Speaker();
-
-  speaker->sayHello();
+  std::cout << "hello world" << std::endl;
 
   std::cout << argc + 2 << std::endl;
   for (int i = 0; i < argc; ++i) {
