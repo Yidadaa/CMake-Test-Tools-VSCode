@@ -1,6 +1,30 @@
 import * as vscode from "vscode";
 import { parseTestCasesFromText, TestCase } from "./parser";
 
+// eslint-disable-next-line @typescript-eslint/naming-convention
+export const GlobalTestStore = {
+  testStore: new Map<string, TestCase>(),
+  fileStore: new Map<string, Set<string>>(),
+  insert(fileId: string, testId: string, testCase: TestCase) {
+    if (!this.fileStore.has(fileId)) {
+      this.fileStore.set(fileId, new Set());
+    }
+    this.fileStore.get(fileId)!.add(testId);
+    this.testStore.set(testId, testCase);
+  },
+  get(testId: string) {
+    return this.testStore.get(testId);
+  },
+  remove(fileId: string, testId: string) {
+    this.fileStore.get(fileId)?.delete(testId);
+    this.testStore.delete(testId);
+  },
+  clear(fileId: string) {
+    this.fileStore.get(fileId)?.forEach((id) => this.testStore.delete(id));
+    this.fileStore.delete(fileId);
+  },
+};
+
 export function buildIdFromTestCase(fileName: string, testCase: TestCase) {
   return `${fileName}:${testCase.token}:${testCase.name}:${testCase.range?.fromLine}-${testCase.range?.toLine}`;
 }
@@ -10,8 +34,17 @@ export function buildTestItemFromTestCases(
   cases: TestCase[],
   uri: vscode.Uri
 ) {
+  const uriId = uri.toString();
+
+  // every time we parse tests from file, we clear old tests first
+  GlobalTestStore.clear(uriId);
+
   function addTestItem(testCase: TestCase) {
-    const id = buildIdFromTestCase(uri.toString(), testCase);
+    const id = buildIdFromTestCase(uriId, testCase);
+
+    // update test cases store, we will use it when running test from test explorer
+    GlobalTestStore.insert(uriId, id, testCase);
+
     const targetLine = testCase.range?.fromLine ?? 0;
     const item = controller.createTestItem(
       id,

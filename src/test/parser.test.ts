@@ -247,4 +247,24 @@ SCENARIO_METHOD(TestMethod, "1") {
     const parsed = parseTestCasesFromText(text);
     expect(excludeParent(parsed)).toEqual([expectResult]);
   });
+
+  it("Match well when existing front brackets", () => {
+    const text = `
+    {}
+      SCENARIO("test() and struct{}") {}
+    `;
+
+    const expectResult: Catch2TestCase = {
+      token: "SCENARIO",
+      name: "test() and struct{}",
+      range: {
+        fromLine: 2,
+        toLine: 2,
+      },
+      children: [],
+    };
+
+    const parsed = parseTestCasesFromText(text);
+    expect(excludeParent(parsed)).toEqual([expectResult]);
+  });
 });

@@ -1,7 +1,5 @@
 #include <catch2/catch_test_macros.hpp>
 
-namespace test {
-
 template <typename T> auto add(T a, T b) { return a + b; }
 
 SCENARIO("single test") {
@@ -19,5 +17,3 @@ SCENARIO("single test") {
 TEST_CASE("hello") {
   SECTION("test") { REQUIRE(add(1, 1) == 2); }
 }
-
-} // namespace test

@@ -5,36 +5,40 @@ import { runCommand } from "./terminal";
 import { TestCase } from "./parser";
 import * as fs from "fs";
 
-export function runTest(testCase?: TestCase) {
+export async function runTest(testCase?: TestCase) {
   GlobalVars.currentTestCase = testCase;
 
-  vscode.commands.executeCommand("cmake.build").then((res) => {
-    vscode.commands
-      .executeCommand("cmake.getLaunchTargetPath")
-      .then((target) => {
-        vscode.window.showInformationMessage(target as string);
+  // build target first
+  await vscode.commands.executeCommand("cmake.build");
 
-        vscode.tasks.executeTask({
-          definition: { type: "" },
-          scope: undefined,
-          name: "Run Test Case",
-          isBackground: false,
-          source: "cmake-test-tools",
-          execution: new vscode.ShellExecution(
-            target as string,
-            GlobalVars.getTestArgs()
-          ),
-          presentationOptions: {},
-          problemMatchers: [],
-          runOptions: {},
-        });
+  // get launch target path
+  const target = await vscode.commands.executeCommand(
+    "cmake.getLaunchTargetPath"
+  );
 
-        // runCommand([target, ...GlobalVars.getTestArgs(true)].join(" "));
-      });
+  vscode.tasks.executeTask({
+    definition: { type: "" },
+    scope: undefined,
+    name: "Run Test Case",
+    isBackground: false,
+    source: "cmake-test-tools",
+    execution: new vscode.ShellExecution(
+      target as string,
+      GlobalVars.getTestArgs()
+    ),
+    presentationOptions: {},
+    problemMatchers: [],
+    runOptions: {},
+  });
+
+  return new Promise<boolean>((res) => {
+    vscode.tasks.onDidEndTaskProcess((e) => {
+      res(e.exitCode === 0);
+    });
   });
 }
 
-export function debugTest(testCase: TestCase) {
+export function debugTest(testCase?: TestCase) {
   GlobalVars.currentTestCase = testCase;
   vscode.debug.startDebugging(undefined, {
     type: "lldb",

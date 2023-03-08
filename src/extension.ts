@@ -4,8 +4,8 @@ import * as vscode from "vscode";
 import * as path from "path";
 
 import { RunTestCodeLensProvider } from "./codelens";
-import { registerAllCommands } from "./commands";
-import { createRunnerFromFile } from "./runner";
+import { debugTest, registerAllCommands, runTest } from "./commands";
+import { GlobalTestStore, createRunnerFromFile } from "./runner";
 
 function breakPathToFolders(targetPath: string) {
   const folders = [];
@@ -24,6 +24,7 @@ function breakPathToFolders(targetPath: string) {
 class TestContext {
   testController: vscode.TestController;
   codeLensController: vscode.Disposable;
+  lastTestItem: vscode.TestItem | undefined;
 
   constructor(private context: vscode.ExtensionContext) {
     this.testController = vscode.tests.createTestController(
@@ -34,14 +35,14 @@ class TestContext {
     this.testController.createRunProfile(
       "Run Test",
       vscode.TestRunProfileKind.Run,
-      this.runTest.bind(this),
+      this.execTest.bind(this),
       true
     );
 
     this.testController.createRunProfile(
       "Debug Test",
       vscode.TestRunProfileKind.Debug,
-      this.runTest.bind(this),
+      this.execTest.bind(this),
       true
     );
 
@@ -91,8 +92,29 @@ class TestContext {
     currentItem.items.add(item);
   }
 
-  runTest() {
-    vscode.window.showInformationMessage("hello" + JSON.stringify(arguments));
+  execTest(runRequest: vscode.TestRunRequest) {
+    this.lastTestItem = runRequest.include?.at(0) ?? this.lastTestItem;
+    const testItem = this.lastTestItem;
+    const testCase = GlobalTestStore.get(testItem?.id ?? "");
+
+    if (runRequest.profile?.kind === vscode.TestRunProfileKind.Run) {
+      const currentTestRun = this.testController.createTestRun(runRequest);
+      testItem && currentTestRun.started(testItem);
+
+      runTest(testCase)
+        .then((success) => {
+          if (success) {
+            testItem && currentTestRun.passed(testItem);
+          } else {
+            testItem && currentTestRun.failed(testItem, []);
+          }
+        })
+        .finally(() => {
+          currentTestRun.end();
+        });
+    } else if (runRequest.profile?.kind === vscode.TestRunProfileKind.Debug) {
+      debugTest(testCase);
+    }
   }
 
   createRunnerFromOpenedFiles() {

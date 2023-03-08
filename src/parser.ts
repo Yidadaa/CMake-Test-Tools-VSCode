@@ -99,7 +99,7 @@ export function getAllTokens(): Record<string, MatchCase> {
 export function parseTestCasesFromText(text: string): TestCase[] {
   const retCase: TestCase = {
     token: "SCENARIO",
-    name: "dummy",
+    name: "root",
     children: [],
   };
 
@@ -144,7 +144,9 @@ export function parseTestCasesFromText(text: string): TestCase[] {
         if (st.at(-1)?.case.range) {
           st.at(-1)!.case.range!.toLine = lineCount;
         }
-        st.pop();
+        if (st.at(-1)!.case !== retCase) {
+          st.pop();
+        }
       }
     } else {
       for (const [name, matchCase] of Object.entries(getAllTokens())) {
