@@ -11,7 +11,7 @@ This extension is an alternative of [TestMate Extension](https://github.com/mate
 All requirements are same as [CMake Tools Extension](https://github.com/microsoft/vscode-cmake-tools).
 
 ## Extension Settings
-{{WIP}}
+- No Settings yet.
 
 ## Known Issues
 Create an issue if you encounter any problems.

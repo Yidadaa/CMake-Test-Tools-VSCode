@@ -2,7 +2,18 @@
   "name": "cmake-test-tools",
   "displayName": "CMake Test Tools",
   "description": "Test Case runner for c++ project with CMake support, support Google Test / Catch2.",
-  "version": "0.0.1",
+  "version": "0.1.0",
+  "icon": "res/icon.png",
+  "publisher": "yifei-zhang",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Yidadaa/CMake-Test-Tools-VSCode/"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Yidadaa/CMake-Test-Tools-VSCode/issues"
+  },
+  "homepage": "https://github.com/Yidadaa/CMake-Test-Tools-VSCode/",
   "engines": {
     "vscode": "^1.73.0"
   },
@@ -38,7 +49,9 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run compile",
+    "vscode:prepublish": "yarn run compile",
+    "vscode:publish": "vsce publish --yarn",
+    "vscode:package": "vsce package --yarn",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "lint": "eslint src --ext ts",
