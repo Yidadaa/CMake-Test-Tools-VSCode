@@ -1,12 +1,12 @@
 # CMake Test Tools Extension for VSCode
 This extension is an alternative of [TestMate Extension](https://github.com/matepek/vscode-catch2-test-adapter), supports Google Test and Catch2.
 
-![banner.png](./res/banner.png)
+![banner.png](./res/doc/banner.png)
 
 ## Preview
 > Here is a screen recording GIF file. Please be patient if your network connection is slow.
 
-![demo.gif](res/demo.gif)
+![demo.gif](res/doc/demo.gif)
 
 ## Features
 - Blazing fast discovering tests from opening files, but not from whole project, which makes it faster than TestMate in huge projects;
@@ -20,7 +20,7 @@ All requirements are same as [CMake Tools Extension](https://github.com/microsof
 ## Usage
 Before click `run` and `debug` button, please make sure that the CMake build target and CMake launch target in the status bar are consistent, and that the target include the file of the case you want to run.
 
-![usage](./res/tip.jpg)
+![usage](./res/doc/tip.jpg)
 
 ## Extension Settings
 - No Settings yet.
