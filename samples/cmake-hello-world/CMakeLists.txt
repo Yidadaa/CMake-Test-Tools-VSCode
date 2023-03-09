@@ -17,8 +17,22 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Catch2)
 
+# gtest library
+FetchContent_Declare(
+  gtest
+  URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt
+    ON
+    CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(gtest)
+
 add_executable(Catch2Test Catch2Test.cpp)
 target_link_libraries(Catch2Test Catch2::Catch2WithMain)
+
+add_executable(GoogleTest GoogleTest.cpp)
+target_link_libraries(GoogleTest gtest_main)
 
 # indicate the entry point for the executable
 add_executable(CMakeHelloWorld Hello HelloWorld.cpp)

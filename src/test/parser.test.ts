@@ -2,6 +2,7 @@ import { expect, describe, it } from "vitest";
 import {
   Catch2TestCase,
   equalFrom,
+  GtestTestCase,
   parseTestCasesFromText,
   TestCase,
 } from "../parser";
@@ -257,6 +258,47 @@ SCENARIO_METHOD(TestMethod, "1") {
     const expectResult: Catch2TestCase = {
       token: "SCENARIO",
       name: "test() and struct{}",
+      range: {
+        fromLine: 2,
+        toLine: 2,
+      },
+      children: [],
+    };
+
+    const parsed = parseTestCasesFromText(text);
+    expect(excludeParent(parsed)).toEqual([expectResult]);
+  });
+});
+
+describe("Parse GTest Cases", () => {
+  it("Matches second param as case name", () => {
+    const text = `
+    TEST(suite, case_name) {}
+    `;
+
+    const expectResult: GtestTestCase = {
+      token: "TEST",
+      name: "case_name",
+      range: {
+        fromLine: 1,
+        toLine: 1,
+      },
+      children: [],
+    };
+
+    const parsed = parseTestCasesFromText(text);
+    expect(excludeParent(parsed)).toEqual([expectResult]);
+  });
+
+  it("not Match token with extra letters", () => {
+    const text = `
+    TEST_OR(suite, case_name) {}
+    TEST (suite, case_name) {}
+    `;
+
+    const expectResult: GtestTestCase = {
+      token: "TEST",
+      name: "case_name",
       range: {
         fromLine: 2,
         toLine: 2,

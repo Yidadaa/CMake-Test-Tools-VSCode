@@ -60,10 +60,12 @@ export const GlobalVars = {
           [] as string[]
         )
         .filter((v) => !!v);
-    }
 
-    if (shouldEscape) {
-      args = args.map(escapeShellArg);
+      if (shouldEscape) {
+        args = args.map(escapeShellArg);
+      }
+    } else if (voteTokenType.maxVoteTokenType === "gtest") {
+      args = args.map((arg) => `--gtest_filter='*${arg}*'`);
     }
 
     return args;

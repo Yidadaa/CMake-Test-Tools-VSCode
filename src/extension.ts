@@ -21,6 +21,8 @@ function breakPathToFolders(targetPath: string) {
   return folders.reverse();
 }
 
+let GlobalTestContext: TestContext | undefined = undefined;
+
 class TestContext {
   testController: vscode.TestController;
   codeLensController: vscode.Disposable;
@@ -128,9 +130,11 @@ class TestContext {
 }
 
 export function activate(context: vscode.ExtensionContext) {
-  const ctx = new TestContext(context);
-  ctx.createRunnerFromOpenedFiles();
-  registerAllCommands(context);
+  if (!GlobalTestContext) {
+    GlobalTestContext = new TestContext(context);
+    GlobalTestContext.createRunnerFromOpenedFiles();
+    registerAllCommands(context);
+  }
 }
 
 // This method is called when your extension is deactivated

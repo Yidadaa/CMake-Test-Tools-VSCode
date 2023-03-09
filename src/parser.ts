@@ -13,6 +13,11 @@ const matchAllString: MatchCase = {
   groupIndex: 0,
 };
 
+const matchSecondParam: MatchCase = {
+  regex: `\(.*,(.*)\)`,
+  groupIndex: 2,
+};
+
 export const CATCH2_TOKENS = {
   ["SCENARIO_METHOD"]: matchFirstStringArg,
   ["SCENARIO"]: matchFirstStringArg,
@@ -44,9 +49,9 @@ export const TOKEN_PREFIX: Record<string, string> = {
 export type Catch2TokenType = keyof typeof CATCH2_TOKENS;
 
 export const GTEST_TOKENS = {
-  ["TEST"]: matchAllString,
-  ["TEST_F"]: matchAllString,
-  ["TEST_P"]: matchAllString,
+  ["TEST_F"]: matchSecondParam,
+  ["TEST_P"]: matchSecondParam,
+  ["TEST"]: matchSecondParam,
 };
 export type GtestTokenType = keyof typeof GTEST_TOKENS;
 
@@ -65,6 +70,18 @@ export const PRESET_TOKENS = [GTEST_TOKENS, CATCH2_TOKENS].reduce(
   },
   {} as Record<string, TokenType>
 );
+
+/**
+ * All avaliable match tokens sorted by length, from long to short.
+ */
+export const ALL_TOKENS = Object.entries({
+  ...GTEST_TOKENS,
+  ...CATCH2_TOKENS,
+})
+  .map(([token, matchCase]) => ({ token, matchCase }))
+  .sort(
+    (a, b) => b.token.length - a.token.length || b.token.localeCompare(a.token)
+  );
 
 export interface TestCaseRange {
   fromLine: number;
@@ -85,15 +102,20 @@ export type GtestTestCase = TestCase<GtestTokenType>;
 export function equalFrom(s: string, pos: number, target: string) {
   let isEqual = s.length - pos >= target.length;
 
-  for (let i = 0; i < target.length; ++i) {
+  let i = 0;
+  for (; i < target.length; ++i) {
     isEqual &&= s.at(pos + i) === target.at(i);
   }
+
+  // determine whether token ends with stop symbol
+  isEqual &&=
+    i >= target.length && [" ", "(", undefined].includes(s.at(pos + i));
 
   return isEqual;
 }
 
-export function getAllTokens(): Record<string, MatchCase> {
-  return { ...GTEST_TOKENS, ...CATCH2_TOKENS };
+export function getAllTokens(): Array<{ token: string; matchCase: MatchCase }> {
+  return ALL_TOKENS;
 }
 
 export function parseTestCasesFromText(text: string): TestCase[] {
@@ -149,7 +171,10 @@ export function parseTestCasesFromText(text: string): TestCase[] {
         }
       }
     } else {
-      for (const [name, matchCase] of Object.entries(getAllTokens())) {
+      for (const tokenGroup of getAllTokens()) {
+        const name = tokenGroup.token;
+        const matchCase = tokenGroup.matchCase;
+
         if (!equalFrom(text, i, name)) {
           continue;
         }
@@ -197,6 +222,7 @@ export function parseTestCasesFromText(text: string): TestCase[] {
 
         const matches = childCase.name.match(matchCase.regex);
         childCase.name = matches ? matches.at(matchCase.groupIndex) ?? "" : "";
+        childCase.name = childCase.name.trim();
         st.at(-1)!.case.children.push(childCase);
         st.push({
           bracketCount: 0,
