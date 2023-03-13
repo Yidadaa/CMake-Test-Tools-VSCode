@@ -17,3 +17,7 @@ SCENARIO("single test") {
 TEST_CASE("hello") {
   SECTION("test") { REQUIRE(add(1, 1) == 2); }
 }
+
+SCENARIO("Test Name") {
+  GIVEN("hello") { REQUIRE(add(1, 1) == 2); }
+}

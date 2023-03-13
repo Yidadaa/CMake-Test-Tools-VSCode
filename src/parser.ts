@@ -223,11 +223,14 @@ export function parseTestCasesFromText(text: string): TestCase[] {
         const matches = childCase.name.match(matchCase.regex);
         childCase.name = matches ? matches.at(matchCase.groupIndex) ?? "" : "";
         childCase.name = childCase.name.trim();
-        st.at(-1)!.case.children.push(childCase);
-        st.push({
-          bracketCount: 0,
-          case: childCase,
-        });
+
+        if (childCase.name) {
+          st.at(-1)!.case.children.push(childCase);
+          st.push({
+            bracketCount: 0,
+            case: childCase,
+          });
+        }
       }
     }
   }

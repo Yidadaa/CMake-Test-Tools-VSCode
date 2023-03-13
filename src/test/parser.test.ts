@@ -294,6 +294,8 @@ describe("Parse GTest Cases", () => {
     const text = `
     TEST_OR(suite, case_name) {}
     TEST (suite, case_name) {}
+    void TEST() {}
+    OTHER_TEST(suite) {}
     `;
 
     const expectResult: GtestTestCase = {
