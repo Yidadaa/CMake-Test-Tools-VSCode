@@ -46,7 +46,7 @@ export function debugTest(testCase?: TestCase) {
     name: "Debug CMake Target Test",
     program: "${command:cmake.launchTargetPath}",
     args: GlobalVars.getTestArgs(),
-    cwd: "${workspaceFolder}",
+    cwd: "${fileWorkspaceFolder}",
   });
 }
 
