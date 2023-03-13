@@ -1,5 +1,7 @@
 # Change Log
 
+## [0.2.5]
+- Feat wont run test if build fails
 
 ## [0.2.4]
 - Fix cannot install error

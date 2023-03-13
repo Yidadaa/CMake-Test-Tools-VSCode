@@ -9,7 +9,13 @@ export async function runTest(testCase?: TestCase) {
   GlobalVars.currentTestCase = testCase;
 
   // build target first
-  await vscode.commands.executeCommand("cmake.build");
+  const buildExitCode: number = await vscode.commands.executeCommand(
+    "cmake.build"
+  );
+
+  if (buildExitCode !== 0) {
+    return;
+  }
 
   // get launch target path
   const target = await vscode.commands.executeCommand(

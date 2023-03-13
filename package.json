@@ -2,7 +2,7 @@
   "name": "cmake-test-tools",
   "displayName": "CMake Test Tools",
   "description": "Test Case runner for c++ project with CMake support, support Google Test / Catch2.",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "icon": "res/icon.png",
   "publisher": "yifei-zhang",
   "repository": {
