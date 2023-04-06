@@ -21,3 +21,11 @@ TEST_CASE("hello") {
 SCENARIO("Test Name") {
   GIVEN("hello") { REQUIRE(add(1, 1) == 2); }
 }
+
+SCENARIO("Test Name [some,test]") {
+  GIVEN("hello") {
+    int a = 1;
+    REQUIRE(add(1, 1) == 2);
+    REQUIRE(add(1, a) == 2);
+  }
+}

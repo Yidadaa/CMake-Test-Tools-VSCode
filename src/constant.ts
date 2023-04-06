@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
 import { PRESET_TOKENS, TOKEN_PREFIX, TestCase, TokenType } from "./parser";
-import { escapeShellArg } from "./terminal";
+import { escapeCatch2Chars, escapeShellArg } from "./terminal";
 
 export const EXTENSION_NAME = "cmake-test-tools";
 
@@ -14,7 +14,7 @@ export enum Commands {
 
 export const GlobalVars = {
   currentTestCase: undefined as TestCase | undefined,
-  getTestArgs(shouldEscape = false): string[] {
+  getTestArgs(shouldEscape = true): string[] {
     let args: string[] = [];
     let testCase = this.currentTestCase;
     const voteForTestType: Record<TokenType, number> = {
@@ -61,9 +61,7 @@ export const GlobalVars = {
         )
         .filter((v) => !!v);
 
-      if (shouldEscape) {
-        args = args.map(escapeShellArg);
-      }
+      args = args.map(escapeCatch2Chars);
     } else if (voteTokenType.maxVoteTokenType === "gtest") {
       args = args.map((arg) => `--gtest_filter='*${arg}*'`);
     }

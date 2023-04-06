@@ -10,6 +10,10 @@ export function runCommand(commandText: string) {
   globalTerminal.sendText(commandText);
 }
 
+export function escapeCatch2Chars(arg: string) {
+  return arg.replace(/\[/, "\\[").replace(/\]/, "\\]").replace(/,/, "\\,");
+}
+
 /**
  * return a shell compatible format
  * @param args
@@ -21,7 +25,10 @@ export function escapeShellArg(arg: string) {
     arg = "'" + arg.replace(/'/g, "'\\''") + "'";
     arg = arg
       .replace(/^(?:'')+/g, "") // unduplicate single-quote at the beginning
-      .replace(/\\'''/g, "\\'"); // remove non-escaped single-quote if there are enclosed between 2 escaped
+      .replace(/\\'''/g, "\\'") // remove non-escaped single-quote if there are enclosed between 2 escaped
+      .replace(/\[/, "\\[")
+      .replace(/\]/, "\\]")
+      .replace(/,/, "\\,");
   }
   return arg;
 }
