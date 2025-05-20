@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from "vscode";
-import { Commands, GlobalVars } from "./constant";
+import { Commands, Configurations, EXTENSION_NAME, GlobalVars } from "./constant";
 import { runCommand } from "./terminal";
 import { TestCase } from "./parser";
 import * as fs from "fs";
@@ -46,8 +46,9 @@ export async function runTest(testCase?: TestCase) {
 
 export function debugTest(testCase?: TestCase) {
   GlobalVars.currentTestCase = testCase;
+  let configuration = vscode.workspace.getConfiguration(EXTENSION_NAME);
   vscode.debug.startDebugging(undefined, {
-    type: "lldb",
+    type: configuration.get(Configurations.DebugType) ?? "lldb",
     request: "launch",
     name: "Debug CMake Target Test",
     program: "${command:cmake.launchTargetPath}",
