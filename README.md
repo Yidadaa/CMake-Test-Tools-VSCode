@@ -23,7 +23,15 @@ Before click `run` and `debug` button, please make sure that the CMake build tar
 ![usage](./res/doc/tip.jpg)
 
 ## Extension Settings
-- No Settings yet.
+```
+{
+  "cmake-test-tools.debugType": {
+    "type": "string",
+    "default": "lldb", // You can change to other debuggers
+    "markdownDescription": "The type for debug command."
+  }
+}
+```
 
 ## Known Issues
 If you encounter any issues while using, please submit an issue [here](https://github.com/Yidadaa/CMake-Test-Tools-VSCode/issues).

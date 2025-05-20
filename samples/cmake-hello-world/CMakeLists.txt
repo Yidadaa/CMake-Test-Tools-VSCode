@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.3)
+cmake_minimum_required(VERSION 3.6)
 project(CMakeHelloWorld)
 
 # version number
@@ -35,7 +35,4 @@ add_executable(GoogleTest GoogleTest.cpp)
 target_link_libraries(GoogleTest gtest_main)
 
 # indicate the entry point for the executable
-add_executable(CMakeHelloWorld Hello HelloWorld.cpp)
-
-# Indicate which libraries to include during the link process.
-target_link_libraries(CMakeHelloWorld Hello)
+add_executable(CMakeHelloWorld HelloWorld.cpp)

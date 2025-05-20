@@ -1,5 +1,8 @@
 # Change Log
 
+## [0.2.7]
+- Support Custom debugger
+
 ## [0.2.6]
 - Fix failed to run catch2 tests while contains /[],/
 

@@ -2,7 +2,7 @@
   "name": "cmake-test-tools",
   "displayName": "CMake Test Tools",
   "description": "Test Case runner for c++ project with CMake support, support Google Test / Catch2.",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "icon": "res/icon.png",
   "publisher": "yifei-zhang",
   "repository": {
@@ -15,7 +15,7 @@
   },
   "homepage": "https://github.com/Yidadaa/CMake-Test-Tools-VSCode/",
   "engines": {
-    "vscode": "^1.73.0"
+    "vscode": "^1.100.0"
   },
   "categories": [
     "Testing"
@@ -61,9 +61,9 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "yarn run compile",
-    "vsc:publish": "vsce publish --yarn",
-    "vsc:package": "vsce package --yarn",
+    "vscode:prepublish": "pnpm run compile",
+    "vsc:publish": "vsce publish",
+    "vsc:package": "vsce package",
     "vsc:login": "vsce login",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
@@ -71,18 +71,17 @@
     "test": "vitest --config ./vitest.config.ts"
   },
   "devDependencies": {
-    "@types/glob": "^8.0.0",
-    "@types/node": "16.x",
-    "@types/vscode": "^1.73.0",
-    "@typescript-eslint/eslint-plugin": "^5.45.0",
-    "@typescript-eslint/parser": "^5.45.0",
-    "@vscode/test-electron": "^2.2.0",
-    "eslint": "^8.28.0",
-    "glob": "^8.0.3",
-    "typescript": "^4.9.3",
-    "vite": "^4.1.4"
-  },
-  "dependencies": {
-    "vitest": "^0.25.5"
+    "@types/glob": "^8.1.0",
+    "@types/node": "~16.18.126",
+    "@types/vscode": "^1.100.0",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "@typescript-eslint/parser": "^5.62.0",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.4.1",
+    "eslint": "^8.57.1",
+    "glob": "^8.1.0",
+    "typescript": "^4.9.5",
+    "vite": "^4.5.14",
+    "vitest": "^3"
   }
 }
