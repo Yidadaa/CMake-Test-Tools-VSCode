@@ -12,6 +12,10 @@ export enum Commands {
   GetTestParam = "cmake-test-tools.getTestParam",
 }
 
+export enum Configurations {
+  DebugType = "debugType",
+}
+
 export const GlobalVars = {
   currentTestCase: undefined as TestCase | undefined,
   getTestArgs(shouldEscape = true): string[] {

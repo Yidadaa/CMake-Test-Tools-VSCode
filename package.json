@@ -46,6 +46,18 @@
         "enablement": "false",
         "title": "Get Test Param"
       }
+    ],
+    "configuration": [
+      {
+        "title": "CMake Test Tools",
+        "properties": {
+          "cmake-test-tools.debugType": {
+            "type": "string",
+            "default": "lldb",
+            "markdownDescription": "The type for debug command."
+          }
+        }
+      }
     ]
   },
   "scripts": {
