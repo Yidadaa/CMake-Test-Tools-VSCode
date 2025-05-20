@@ -67,7 +67,7 @@ export const GlobalVars = {
 
       args = args.map(escapeCatch2Chars);
     } else if (voteTokenType.maxVoteTokenType === "gtest") {
-      args = args.map((arg) => `--gtest_filter='*${arg}*'`);
+      args = args.map((arg) => `--gtest_filter=*${arg}*`);
     }
 
     return args;
